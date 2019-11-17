@@ -1,0 +1,86 @@
+OUTPUT_ARCH("riscv")
+ENTRY(_start)
+
+
+/*
+{
+	ramall(rwx)	: o = 0x80000000, l = 0x8000 
+	ram(rwx)	: o = 0x80000000, l = 0x7f00 
+	userstack(rw)	: o = 0x80007500, l = 0x0000 
+	bootstack(rw)	: o = 0x80008000, l = 0x0000 
+	intrstack(rw)	: o = 0x80008000, l = 0x0000 
+}
+*/
+MEMORY
+{
+	ramall(rwx)	: o = 0x80000000, l = 0x800000 
+	ram(rwx)	: o = 0x80000000, l = 0x4f0000 
+	userstack(rw)	: o = 0x805f0000, l = 0x0000 
+	bootstack(rw)	: o = 0x80900000, l = 0x0000 
+	intrstack(rw)	: o = 0x80800000, l = 0x0000 
+}
+
+SECTIONS
+{
+	. = 0x80000000;		/* 先頭番地 */
+
+	.text : {
+	      	text_start = .;
+	      	*(.text.init)
+	      	*(.text)
+		etext = .;
+	} > ram
+
+	.rodata : {
+		rodata_start = .;
+		*(.strings)
+		*(.rodata)
+		*(.rodata.*)
+		erodata = .;
+	} > ram
+
+	.data : {
+	      	data_start = .;
+	      	*(.data)
+		edata = .;
+	} > ram
+
+	.sdata : {
+	      	sdata_start = .;
+	      	*(.sdata)
+		esdata = .;
+	} > ram
+
+	.bss : {
+	       bss_start = .;
+	       *(.bss)
+	       *(COMMON)
+	       ebss = .;
+	} > ram
+	
+	.sbss : {
+	       sbss_start = .;
+	       *(.sbss)
+	       *(COMMON)
+	       esbss = .;
+	} > ram
+
+	. = ALIGN(4);
+	_end = .;
+
+	.freearea : {
+		freearea = .;
+	} > ram
+
+	.userstack : {
+	       userstack = .;
+	} > userstack
+
+	.bootstack : {
+	       bootstack = .;
+	} > bootstack
+
+	.intrstack : {
+	       intrstack = .;
+	} > intrstack
+}
