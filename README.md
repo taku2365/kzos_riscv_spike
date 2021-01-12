@@ -1,6 +1,6 @@
 # KOZOS
 
-Risc-v KOZOS
+RISC-V KOZOS
 
 
 ref 
